@@ -85,7 +85,7 @@ export class AppModule {
 }
 ```
 
-### Adding example API
+## Adding example API
 
 In `app.controller.ts`, changing `@Get` to `@Post` :
 
