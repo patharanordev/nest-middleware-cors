@@ -1,5 +1,16 @@
 # Nest middleware with CORS
 
+> AppModule based on `NestFastifyApplication`.
+
+![overview](./assets/overview.png)
+
+I would like to receive request from partner service only. How to block other services... :
+
+Assume:
+
+- Our service is `nest-middleware-cors.vercel.app`.
+- Partner service is `mockja.vercel.app`.
+
 Directory structure :
 
 ```sh
@@ -45,20 +56,30 @@ import { allowedOrigins } from './constants/allowed-origin';
 @Injectable()
 export class CorsMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: () => void) {
-    const hostname = req.hostname;
-    console.log('hostname:', hostname);
-    if (allowedOrigins.indexOf(hostname) > -1) {
-      console.log('allowed cors for:', hostname);
-      res.setHeader('Access-Control-Allow-Origin', hostname);
+    const origin = req.headers.origin;
+    const allowedHeaders = [
+      'Access-Control-Allow-Origin',
+      'Origin',
+      'X-Requested-With',
+      'Accept',
+      'Content-Type',
+      'Authorization',
+    ]
+
+    // Ensure that client sent origin to our service
+    console.log('headers:', req.headers)
+
+    if (allowedOrigins.indexOf(origin) > -1) {
+      console.log('allowed cors for:', origin);
+      res.setHeader('Access-Control-Allow-Origin', origin);
       res.setHeader('Access-Control-Allow-Methods', 'POST');
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept');
+      res.setHeader('Access-Control-Allow-Headers', allowedHeaders.join(', '));
       next();
     } else {
       throw new HttpException('Host not allowed', HttpStatus.BAD_REQUEST);
     }
   }
 }
-
 ```
 
 ## Consume middleware
@@ -90,7 +111,7 @@ export class AppModule {
 In `app.controller.ts`, changing `@Get` to `@Post` :
 
 ```ts
-import { Controller, Post } from '@nestjs/common';
+import { Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
@@ -98,9 +119,21 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Post()
-  getHello(): string {
-    return this.appService.getHello();
+  async getHello(@Res() res) {
+    return res.send({
+      statusCode: HttpStatus.OK,
+      message: this.appService.getHello()
+    });
   }
+}
+```
+
+example response :
+
+```json
+{
+  "statusCode": 200,
+  "message": "Hello World!"
 }
 ```
 
@@ -145,18 +178,64 @@ yarn start:dev
 
 ## Testing
 
+I have already deploy service to `Vercel` server. Let's try based on use case below.
+
+This is example source code for `mockja.vercel.app` :
+
+- Adding `Origin` to headers.
+- `POST` to `nest-middleware-cors.vercel.app`.
+
+```js
+const express = require('express')
+const axios = require('axios')
+const router = express.Router()
+
+router.post('/nest/cors', async (req, res) => {
+
+    const response = await axios({
+        method: 'post',
+        url: process.env.TEST_NEST_CORS_URL,
+        headers: {
+            Origin: req.headers.host,
+        },
+        data: {}
+    })
+    .then((r) => ({ error: null, data: r.data }))
+    .catch((e) => ({ error: e, data: null }))
+
+    if(response.error) {
+        console.log('error:', response.error.message)
+        res
+        .status(response.error.response.status)
+        .json({ 
+            statusCode: response.error.response.status, 
+            message: response.error.message
+        })
+    } else {
+        console.log('data:', response.data)
+        res.status(response.data.statusCode).json(response.data)
+    }
+})
+
+module.exports = router
+```
+
 In `./constants/allowed-origin.ts`, adding some server host name :
 
 ```ts
 export const allowedOrigins = ['mockja.vercel.app'];
 ```
 
-![ex-host-not-allow](assets/ex-host-not-allow.png)
+Start from calling API in `https://mockja.vercel.app` to trick it to POST to `nest-middleware-cors.vercel.app`.
 
-Let's try to adding `localhost` :
+In `nest-middleware-cors.vercel.app`, you will see origin :
 
-```ts
-export const allowedOrigins = ['mockja.vercel.app', 'localhost'];
-```
+![check-client-header-in-our-service](./assets/check-client-header-in-our-service.png)
 
-![ex-host-allow](assets/ex-host-allow.png)
+In `mockja.vercel.app`, you will got the result :
+
+![result-from-mockja](assets/result-from-mockja.png)
+
+In case you calling from `localhost`, you will be blocked :
+
+![ex-host-not-allow](./assets/ex-host-not-allow.png)
