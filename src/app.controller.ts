@@ -2,7 +2,7 @@ import { Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { AppService } from './app.service';
 import { allowedHost } from './constants/allowed-origin';
 
-@Controller({ host: allowedHost })
+@Controller({ host:'mockja.vercel.app' })
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
