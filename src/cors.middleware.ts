@@ -10,27 +10,32 @@ import { allowedOrigins } from './constants/allowed-origin';
 @Injectable()
 export class CorsMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: () => void) {
-    const origin = req.headers.origin;
-    const allowedHeaders = [
-      'Access-Control-Allow-Origin',
-      'Origin',
-      'X-Requested-With',
-      'Accept',
-      'Content-Type',
-      'Authorization',
-    ]
+    // const origin = req.headers.origin;
+    // const allowedHeaders = [
+    //   'Access-Control-Allow-Origin',
+    //   'Origin',
+    //   'X-Requested-With',
+    //   'Accept',
+    //   'Content-Type',
+    //   'Authorization',
+    // ]
 
-    // Ensure that client sent origin to our service
-    console.log('headers:', req.headers)
+    // // Ensure that client sent origin to our service
+    // console.log('headers:', req.headers)
 
-    if (allowedOrigins.indexOf(origin) > -1) {
-      console.log('allowed cors for:', origin);
-      res.setHeader('Access-Control-Allow-Origin', origin);
-      res.setHeader('Access-Control-Allow-Methods', 'POST');
-      res.setHeader('Access-Control-Allow-Headers', allowedHeaders.join(', '));
-      next();
-    } else {
-      throw new HttpException('Host not allowed', HttpStatus.BAD_REQUEST);
-    }
+    // if (allowedOrigins.indexOf(origin) > -1) {
+    //   console.log('allowed cors for:', origin);
+    //   res.setHeader('Access-Control-Allow-Origin', origin);
+    //   res.setHeader('Access-Control-Allow-Methods', 'POST');
+    //   res.setHeader('Access-Control-Allow-Headers', allowedHeaders.join(', '));
+    //   next();
+    // } else {
+    //   throw new HttpException('Host not allowed', HttpStatus.BAD_REQUEST);
+    // }
+
+    console.log('request headers:', req.headers)
+    next();
+
+
   }
 }
