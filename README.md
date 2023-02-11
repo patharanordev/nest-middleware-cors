@@ -1,6 +1,20 @@
 # Nest middleware with CORS
 
 > AppModule based on `NestFastifyApplication`.
+> 
+> ```ts
+> import { NestFactory } from '@nestjs/core';
+> import { NestFastifyApplication } from '@nestjs/platform-fastify';
+> 
+> import { AppModule } from './app.module';
+> 
+> async function bootstrap() {
+>   const app = await NestFactory.create<NestFastifyApplication>(AppModule);
+>   await app.listen(3000, '0.0.0.0');
+> }
+> bootstrap();
+> 
+> ```
 
 ![overview](./assets/overview.png)
 
