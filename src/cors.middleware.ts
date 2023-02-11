@@ -16,7 +16,8 @@ export class CorsMiddleware implements NestMiddleware {
     console.log('req.header:', req.header);
     console.log('req.originalUrl:', req.originalUrl);
     console.log('req.url:', req.url);
-    console.log('req.host:', req.host);
+    console.log('req.get(\'host\'):', req.get('host'));
+    console.log('req.get(\'Host\'):', req.get('Host'));
     console.log('req.hostname:', req.hostname);
     console.log('req.ips:', req.ips);
     console.log('req.get(\'origin\'):', req.get('origin'));
