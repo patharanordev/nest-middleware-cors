@@ -30,6 +30,7 @@ export class CorsMiddleware implements NestMiddleware {
     // } else {
     //   throw new HttpException('Host not allowed', HttpStatus.BAD_REQUEST);
     // }
+    
     next();
   }
 }
