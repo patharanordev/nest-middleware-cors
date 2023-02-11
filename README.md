@@ -34,7 +34,16 @@ Directory structure :
 └── tsconfig.json
 ```
 
-## Create CORS middleware
+To allow specific host access to our service, I found 2-ways :
+
+- Set CORS.
+- Use `@Controller` decorator.
+
+## Set CORS
+
+This is the best way to global block other services that we don't want.
+
+### Create CORS middleware
 
 Create `cors.middleware.ts` then :
 
@@ -82,7 +91,7 @@ export class CorsMiddleware implements NestMiddleware {
 }
 ```
 
-## Consume middleware
+### Consume middleware
 
 In `app.module.ts` adding middleware consumer, by focusing on specific path `/*` with `POST` method :
 
@@ -106,7 +115,7 @@ export class AppModule {
 }
 ```
 
-## Adding example API
+### Adding example API
 
 In `app.controller.ts`, changing `@Get` to `@Post` :
 
@@ -137,7 +146,7 @@ example response :
 }
 ```
 
-## Usage
+### Usage
 
 Install dependencies :
 
@@ -176,7 +185,7 @@ yarn start:dev
 [Nest] 11194  - MM/DD/YYYY, HH:mm:ss PM     LOG [NestApplication] Nest application successfully started +1ms
 ```
 
-## Testing
+### Testing
 
 I have already deploy service to `Vercel` server. Let's try based on use case below.
 
@@ -239,3 +248,75 @@ In `mockja.vercel.app`, you will got the result :
 In case you calling from `localhost`, you will be blocked :
 
 ![ex-host-not-allow](./assets/ex-host-not-allow.png)
+
+## Use `@Controller` decorator
+
+In case your partner didn't provide `Origin` in headers of their incoming request. This way can block incoming request to our endpoints.
+
+Just add your whitelist to `@Controller({ host })` :
+
+```ts
+import { Controller, HttpStatus, Post, Res } from '@nestjs/common';
+import { AppService } from './app.service';
+import { allowedOrigins } from './constants/allowed-origin';
+
+@Controller({ host:allowedOrigins })
+export class AppController {
+  constructor(private readonly appService: AppService) {}
+
+  @Post()
+  async getHello(@Res() res) {
+    return res.send({
+      statusCode: HttpStatus.OK,
+      message: this.appService.getHello()
+    });
+  }
+}
+```
+
+### Testing
+
+**Case#1** : provide specific host and localhost
+
+```ts
+export const allowedOrigins = ['mockja.vercel.app', 'localhost'];
+```
+
+let's `POST` to your API :
+
+```sh
+curl --location --request POST 'http://localhost:3000' \
+--header 'Origin: localhost'
+```
+
+output :
+
+```json
+{
+    "statusCode": 200,
+    "message": "Hello World!"
+}
+```
+
+**Case#2** : provide specific host only
+
+```ts
+export const allowedOrigins = ['mockja.vercel.app'];
+```
+
+let's `POST` to your API :
+
+```sh
+curl --location --request POST 'http://localhost:3000' \
+--header 'Origin: localhost'
+```
+
+output :
+
+```json
+{
+    "statusCode": 404,
+    "message": "Cannot POST /",
+    "error": "Not Found"
+}
+```
