@@ -50,7 +50,8 @@ Directory structure :
 
 To allow specific host access to our service :
 
-- Set CORS
+- Set CORS *(this way is not secure, ref. [here](https://stackoverflow.com/a/21058346))*
+- Other way, soon...
 
 ## Set CORS
 
