@@ -9,9 +9,9 @@ import { CorsMiddleware } from './cors.middleware';
   providers: [AppService],
 })
 export class AppModule {
-  // configure(consumer: MiddlewareConsumer) {
-  //   consumer
-  //     .apply(CorsMiddleware)
-  //     .forRoutes({ path: '/*', method: RequestMethod.POST });
-  // }
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(CorsMiddleware)
+      .forRoutes({ path: '/*', method: RequestMethod.POST });
+  }
 }
