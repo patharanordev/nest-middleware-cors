@@ -7,7 +7,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Post()
-  async getHello(@Res() res) {
+  getHello(@Res() res) {
     return res.send({
       statusCode: HttpStatus.OK,
       message: this.appService.getHello()
