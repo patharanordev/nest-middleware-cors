@@ -37,11 +37,24 @@ Directory structure :
 To allow specific host access to our service, I found 2-ways :
 
 - Set CORS.
-- Use `@Controller` decorator.
+- Use `@Controller` decorator. *[**Recommended**]*
 
 ## Set CORS
 
 This is the best way to global block other services that we don't want.
+
+> ---
+> **IMPORTANT** : `origin` can be `undefined` or fake from source/client.
+> 
+> The origin may be hidden if the user comes from an ssl encrypted website
+> 
+> Also: Some browser extensions remove origin and referer from the http-request headers, and therefore the origin property will be empty.
+> 
+> You might want to create some sort of authentication token and pass it as a parameter, instead on relying on request headers. Especially since the headers can be faked/manipulated.
+> 
+> Ref. https://stackoverflow.com/a/29531709
+> 
+> ---
 
 ### Create CORS middleware
 
@@ -251,7 +264,7 @@ In case you calling from `localhost`, you will be blocked :
 
 ## Use `@Controller` decorator
 
-In case your partner didn't provide `Origin` in headers of their incoming request. This way can block incoming request to our endpoints.
+This way can block incoming request to our endpoints by checking incoming **real `host` name** *(You can use custom decorator or validate, pipe, guard also)*.
 
 Just add your whitelist to `@Controller({ host })` :
 
@@ -285,8 +298,7 @@ export const allowedOrigins = ['mockja.vercel.app', 'localhost'];
 let's `POST` to your API :
 
 ```sh
-curl --location --request POST 'http://localhost:3000' \
---header 'Origin: localhost'
+curl --location --request POST 'http://localhost:3000'
 ```
 
 output :
@@ -307,8 +319,7 @@ export const allowedOrigins = ['mockja.vercel.app'];
 let's `POST` to your API :
 
 ```sh
-curl --location --request POST 'http://localhost:3000' \
---header 'Origin: localhost'
+curl --location --request POST 'http://localhost:3000'
 ```
 
 output :
