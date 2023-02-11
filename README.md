@@ -48,10 +48,9 @@ Directory structure :
 └── tsconfig.json
 ```
 
-To allow specific host access to our service, I found 2-ways :
+To allow specific host access to our service :
 
-- Set CORS.
-- Use `@Controller` decorator. *[**Recommended**]*
+- Set CORS
 
 ## Set CORS
 
@@ -275,73 +274,3 @@ In `mockja.vercel.app`, you will got the result :
 In case you calling from `localhost`, you will be blocked :
 
 ![ex-host-not-allow](./assets/ex-host-not-allow.png)
-
-## Use `@Controller` decorator
-
-This way can block incoming request to our endpoints by checking incoming **real `host` name** *(You can use custom decorator or validate, pipe, guard also)*.
-
-Just add your whitelist to `@Controller({ host })` :
-
-```ts
-import { Controller, HttpStatus, Post, Res } from '@nestjs/common';
-import { AppService } from './app.service';
-import { allowedOrigins } from './constants/allowed-origin';
-
-@Controller({ host:allowedOrigins })
-export class AppController {
-  constructor(private readonly appService: AppService) {}
-
-  @Post()
-  async getHello(@Res() res) {
-    return res.send({
-      statusCode: HttpStatus.OK,
-      message: this.appService.getHello()
-    });
-  }
-}
-```
-
-### Testing
-
-**Case#1** : provide specific host and localhost
-
-```ts
-export const allowedOrigins = ['mockja.vercel.app', 'localhost'];
-```
-
-let's `POST` to your API :
-
-```sh
-curl --location --request POST 'http://localhost:3000'
-```
-
-output :
-
-```json
-{
-    "statusCode": 200,
-    "message": "Hello World!"
-}
-```
-
-**Case#2** : provide specific host only
-
-```ts
-export const allowedOrigins = ['mockja.vercel.app'];
-```
-
-let's `POST` to your API :
-
-```sh
-curl --location --request POST 'http://localhost:3000'
-```
-
-output :
-
-```json
-{
-    "statusCode": 404,
-    "message": "Cannot POST /",
-    "error": "Not Found"
-}
-```
