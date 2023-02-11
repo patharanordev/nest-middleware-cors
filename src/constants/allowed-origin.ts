@@ -1,1 +1,1 @@
-export const allowedOrigins = ['mockja.vercel.app', 'localhost'];
+export const allowedOrigins = ['mockja.vercel.app', 'localhost:3000'];
