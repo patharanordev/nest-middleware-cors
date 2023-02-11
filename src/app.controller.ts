@@ -1,8 +1,8 @@
 import { Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { AppService } from './app.service';
-import { allowedOrigins } from './constants/allowed-origin';
+import { allowedHost } from './constants/allowed-origin';
 
-@Controller({ host:allowedOrigins })
+@Controller({ host: allowedHost })
 export class AppController {
   constructor(private readonly appService: AppService) {}
 

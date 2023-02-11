@@ -271,9 +271,9 @@ Just add your whitelist to `@Controller({ host })` :
 ```ts
 import { Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { AppService } from './app.service';
-import { allowedOrigins } from './constants/allowed-origin';
+import { allowedHost } from './constants/allowed-origin';
 
-@Controller({ host:allowedOrigins })
+@Controller({ host:allowedHost })
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
@@ -289,19 +289,15 @@ export class AppController {
 
 ### Testing
 
-**Case#1** : provide specific host and localhost
+provide specific host only :
 
 ```ts
-export const allowedOrigins = ['https://mockja.vercel.app', 'http://localhost'];
+export const allowedHost = 'mockja.vercel.app';
 ```
 
-let's `POST` to your API :
+**Case#1** : calling to specific host
 
-```sh
-curl --location --request POST 'http://localhost:3000'
-```
-
-output :
+let's `POST` from `mockja.vercel.app` to `nest-middleware-cors.vercel.app` , ex. output :
 
 ```json
 {
@@ -310,11 +306,7 @@ output :
 }
 ```
 
-**Case#2** : provide specific host only
-
-```ts
-export const allowedOrigins = ['https://mockja.vercel.app'];
-```
+**Case#2** : calling via localhost
 
 let's `POST` to your API :
 
