@@ -20,13 +20,15 @@ export class CorsMiddleware implements NestMiddleware {
       'Authorization',
     ]
 
+    // Ensure that client sent origin to our service
+    console.log('headers:', req.headers)
+
     if (allowedOrigins.indexOf(origin) > -1) {
       console.log('allowed cors for:', origin);
       res.setHeader('Access-Control-Allow-Origin', origin);
       res.setHeader('Access-Control-Allow-Methods', 'POST');
       res.setHeader('Access-Control-Allow-Headers', allowedHeaders.join(', '));
       next();
-
     } else {
       throw new HttpException('Host not allowed', HttpStatus.BAD_REQUEST);
     }
