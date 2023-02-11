@@ -292,7 +292,7 @@ export class AppController {
 **Case#1** : provide specific host and localhost
 
 ```ts
-export const allowedOrigins = ['mockja.vercel.app', 'localhost'];
+export const allowedOrigins = ['https://mockja.vercel.app', 'http://localhost'];
 ```
 
 let's `POST` to your API :
@@ -313,7 +313,7 @@ output :
 **Case#2** : provide specific host only
 
 ```ts
-export const allowedOrigins = ['mockja.vercel.app'];
+export const allowedOrigins = ['https://mockja.vercel.app'];
 ```
 
 let's `POST` to your API :
